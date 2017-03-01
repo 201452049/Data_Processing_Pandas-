@@ -1,0 +1,105 @@
+/*Answer Part-1 */
+				import pandas as pd
+
+				df = pd.read_csv('olympics.csv', index_col=0, skiprows=1)
+
+				for col in df.columns:
+					if col[:2]=='01':
+						df.rename(columns={col:'Gold'+col[4:]}, inplace=True)
+					if col[:2]=='02':
+						df.rename(columns={col:'Silver'+col[4:]}, inplace=True)
+					if col[:2]=='03':
+						df.rename(columns={col:'Bronze'+col[4:]}, inplace=True)
+					if col[:1]=='№':
+						df.rename(columns={col:'#'+col[1:]}, inplace=True)
+
+				names_ids = df.index.str.split('\s\(') # split the index by '('
+
+				df.index = names_ids.str[0] # the [0] element is the country name (new index) 
+				df['ID'] = names_ids.str[1].str[:3] # the [1] element is the abbreviation or ID (take first 3 characters from that)
+
+				df = df.drop('Totals')
+				df.head()
+				
+/*Question-0*/
+				  
+				def answer_zero():
+					
+					return df.iloc[0]
+				
+				answer_zero() 
+/*Question-1 */
+
+							  
+				def answer_one():
+					
+					return df['Gold'].idxmax()
+					 
+				answer_one()
+/*Question-2*/
+				def answer_two():
+				     return (df['Gold']-df['Gold.1']).idxmax()
+			    answer_two()
+				
+/*Question-3 */
+
+				def answer_three():
+					df1=df[(df['Gold']>0) & (df['Gold.1']>0)]
+					return abs((df1['Gold']-df1['Gold.1'])/(df1['Gold']+df1['Gold.1'])).idxmax()
+				answer_three()
+				
+/*Question-4 */
+
+				def answer_four():
+					Points=pd.Series(df['Gold.2']*3 + df['Silver.2']*2 +df['Bronze.2']*1)
+					return Points
+				answer_four()
+				
+/*
+	PART-2
+ Question-5*/
+				 
+				 def answer_five():
+					cns = census_df[census_df['SUMLEV']==50]
+					grouped = cns.groupby('STNAME')
+					cns2=grouped.aggregate(np.sum)
+					return cns2['COUNTY'].idxmax()
+				answer_five()
+				
+/*Question-6*/
+				import pandas as pd
+				import numpy as np
+				def answer_six():
+					cns = census_df[census_df['SUMLEV']==50]
+					ls1= cns.groupby('STNAME').apply(lambda x: x.sort_values('CENSUS2010POP',ascending=False))
+					ls2=ls1.groupby('STNAME').head(3)
+					LS3=ls2[['STNAME','CENSUS2010POP']]
+					ls4=LS3.groupby('STNAME')
+					ls5=ls4.aggregate(np.sum)
+					ls6=ls5.sort_values('CENSUS2010POP', ascending=[False]).head(3)
+					return list(ls6.index)
+				answer_six()
+				
+				
+/*Question-7*/
+				def answer_seven():
+					cns = census_df[census_df['SUMLEV']==50]
+					cns4=cns[['CTYNAME','POPESTIMATE2010','POPESTIMATE2011','POPESTIMATE2012','POPESTIMATE2013','POPESTIMATE2014','POPESTIMATE2015']]
+					cns4['Highest-change']=cns4[['POPESTIMATE2010','POPESTIMATE2011','POPESTIMATE2012','POPESTIMATE2013','POPESTIMATE2014','POPESTIMATE2015']].max(axis=1) -cns4[['POPESTIMATE2010','POPESTIMATE2011','POPESTIMATE2012','POPESTIMATE2013','POPESTIMATE2014','POPESTIMATE2015']].min(axis=1) 
+					id=cns4['Highest-change'].idxmax()
+					return cns4.loc[2667]['CTYNAME']
+				answer_seven()
+
+/*Question-8*/
+
+				import pandas as pd
+				census_df = pd.read_csv('census.csv')
+				def answer_eight():
+					cns5=census_df[census_df['SUMLEV']==50]
+					cns6=cns5[((cns5['REGION']==1)|(cns5['REGION']==2))]
+					cns7=cns6[cns6['CTYNAME']=='Washington County']
+					cns8=cns7[(cns7['POPESTIMATE2015'])>(cns7['POPESTIMATE2014'])] 
+					return cns8[['STNAME','CTYNAME']]
+				answer_eight()
+
+

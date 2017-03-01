@@ -1,0 +1,617 @@
+//* answer_one *//
+
+import pandas as pd
+import numpy as np
+import re
+def answer_one():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+   
+    
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    return merge4
+answer_one()
+
+
+//* answer_two *//
+
+import pandas as pd
+import numpy as np
+import re
+def answer_two():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    l1=len((pd.merge(energy1, gdp_df, how="inner",left_on='Country',right_on='Country Name').drop('Country Name',1).set_index('Country')).index)
+    l2=len((pd.merge(energy1, scimEn, how="inner",left_on='Country',right_on='Country').set_index('Country')).index)
+    l3=len((pd.merge(gdp_df, scimEn, how="inner",left_on='Country Name',right_on='Country').drop('Country Name',1).set_index('Country')).index)
+    al1=len(energy1.index)
+    al2=len(gdp_df.index)
+    al3=len(scimEn.index)
+    return (al1 + al2 + al3)-(l1+l2+l3)
+answer_two()
+
+
+//* answer_three *//
+import pandas as pd
+import numpy as np
+import re
+def answer_three():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    merge5=merge4[['2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    merge5['avgdp'] = merge5.mean(axis=1)
+    merge5=merge5[['avgdp']]
+    merge5=merge5.sort('avgdp',ascending=False)
+    s = merge5.ix[:,0]
+    return s
+answer_three()
+
+
+//* answer_four *//
+import pandas as pd
+import numpy as np
+import re
+def answer_four():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    merge5=merge4[['2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    merge5['avgdp'] = merge5.mean(axis=1)
+    merge5=merge5.sort('avgdp',ascending=False)
+    merge5=np.abs(merge5['2006']-merge5['2015'])
+    return merge5[5]
+answer_four()
+
+//* answer_five *//
+
+import pandas as pd
+import numpy as np
+import re
+def answer_five():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    return np.mean(merge4['Energy Supply per Capita'])
+answer_five()
+
+//* answer six *//
+import pandas as pd
+import numpy as np
+import re
+def answer_six():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    merge4=merge4[['% Renewable']]
+    merge4=merge4.reset_index()
+    series= merge4.loc[merge4['% Renewable'].idxmax()]
+    res = [(val) for idx, val in series.iteritems()]
+    return tuple(res)
+answer_six()
+
+//* answer_seven() *//
+import pandas as pd
+import numpy as np
+import re
+def answer_seven():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    merge4=merge4[['Citations','Self-citations']]
+    merge4['ratio']=merge4['Self-citations']/merge4['Citations']
+    merge4=merge4[['ratio']]
+    merge4=merge4.reset_index()
+    series= merge4.loc[merge4['ratio'].idxmax()]
+    res = [(val) for idx, val in series.iteritems()]
+    return tuple(res)
+    
+answer_seven()
+
+//* answer_eight *//
+import pandas as pd
+import numpy as np
+import re
+import matplotlib as plt
+
+ConDict  = {'China':'Asia', 
+             'United States':'North America', 
+            'Japan':'Asia', 
+                      'United Kingdom':'Europe', 
+                      'Russian Federation':'Europe', 
+                      'Canada':'North America', 
+                      'Germany':'Europe', 
+                      'India':'Asia',
+                      'France':'Europe', 
+                      'South Korea':'Asia', 
+                      'Italy':'Europe', 
+                      'Spain':'Europe', 
+                      'Iran':'Asia',
+                      'Australia':'Australia', 
+                      'Brazil':'South America'}
+
+GDP = pd.read_csv('world_bank.csv',skiprows = [1,2,3],header=1)
+GDP.replace(['Iran, Islamic Rep.','Hong Kong SAR, China','Korea, Rep.'],['Iran','Hong Kong','South Korea'],inplace = True)
+col = ['Country Name','2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015']
+GDP1 = GDP
+GDP1 = GDP1[col]
+
+energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+energy = energy.rename(columns={'Unnamed: 0': 'Country','Energy Supply':'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+energy.iloc[0]=np.nan
+energy.replace('...', np.nan,inplace=True)
+energy['Energy Supply'] = energy['Energy Supply']*1000000 
+        
+for names in list(energy['Country']):
+    if '(' in str(names):
+        energy.Country[energy.Country==names] = names[:names.index('(')-1]
+        
+for names in list(energy['Country']):
+    if bool(re.search(r'\d', str(names))):
+        energy.Country[energy.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+
+energy.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace = True)
+energy.replace(['Republic of Korea'],['South Korea'],inplace = True)
+energy.replace(['United States of America'],['United States'],inplace = True)
+energy.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace = True)
+        
+ScimEn = pd.read_excel('scimagojr-3.xlsx')
+
+def answer_one() :
+	return pd.merge(pd.merge(ScimEn[ScimEn.Rank<=15],energy,how = 'inner',on='Country'),GDP1,how= 'inner',left_on='Country',right_on='Country Name').drop('Country Name', 		 1).set_index('Country')
+def answer_eight():
+    Top15 = answer_one()
+    Top15['population'] = Top15['Energy Supply']/Top15['Energy Supply per Capita']
+    Top15.sort_values(['population'], ascending=[False], inplace=True)
+    return Top15.index.values[2]
+answer_eight()
+
+//* answer_nine() *//
+
+import pandas as pd
+import numpy as np
+import re
+def answer_nine():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    merge4['est_population']=merge4['Energy Supply']/merge4['Energy Supply per Capita']
+    merge4=merge4[['est_population','Citable documents','Energy Supply per Capita']]
+    
+    merge4['est_cdoc_per_capita']=merge4['Citable documents']/merge4['est_population']
+    merge4['Energy Supply per Capita']=merge4['Energy Supply per Capita'].tolist()
+    merge4['est_cdoc_per_capita']=merge4['est_cdoc_per_capita'].tolist()
+    return merge4['est_cdoc_per_capita'].corr(merge4['Energy Supply per Capita'])
+answer_nine()
+
+//* answer_ten *//
+import pandas as pd
+import numpy as np
+import re
+def answer_ten():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    merge4=merge4[["% Renewable","Rank"]]
+    merge4=merge4.reset_index()
+    merge4['a']=0
+    mean1=merge4["% Renewable"].mean()
+    for index in merge4.index :
+        if (merge4.loc[index]['% Renewable'] >= mean1) :
+            merge4.set_value(index,'a',1)
+        else:
+            merge4.set_value(index,'a',0)
+    
+    merge4=merge4.set_index(merge4['Country']).drop('Country',1)
+    merge4=merge4.sort('Rank', ascending=True)
+    merge4=merge4['% Renewable']
+    return pd.Series(merge4)
+answer_ten()
+
+// answer_eleven *//
+import pandas as pd
+import numpy as np
+import re
+def answer_eleven():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    merge4=merge4[['Energy Supply','Energy Supply per Capita']]
+    merge4['est_population']=merge4['Energy Supply']/merge4['Energy Supply per Capita']
+    merge4=merge4[['est_population']]
+    merge4=merge4.reset_index()
+    merge4['continent']=""
+    ContinentDict  = {'China':'Asia', 
+                  'United States':'North America', 
+                  'Japan':'Asia', 
+                  'United Kingdom':'Europe', 
+                  'Russian Federation':'Europe', 
+                  'Canada':'North America', 
+                  'Germany':'Europe', 
+                  'India':'Asia',
+                  'France':'Europe', 
+                  'South Korea':'Asia', 
+                  'Italy':'Europe', 
+                  'Spain':'Europe', 
+                  'Iran':'Asia',
+                  'Australia':'Australia', 
+                  'Brazil':'South America'}
+    
+    for index in merge4.index:
+                merge4.loc[index]['continent']=ContinentDict[merge4.loc[index]["Country"]]
+    merge4['size']=1
+    grouped=merge4.groupby('continent').agg({'size':'size','est_population':'sum'})
+    grouped['mean']=grouped['est_population']/grouped['size']
+    grouped['std']=grouped.std(axis=1)
+    grouped.columns=['size','sum','mean','std']
+    return grouped.head()
+answer_eleven()
+
+// answer-12 *//
+
+import pandas as pd
+import numpy as np
+import re
+def answer_twelve():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge3['continent']=""
+    ContinentDict  = {'China':'Asia', 
+                  'United States':'North America', 
+                  'Japan':'Asia', 
+                  'United Kingdom':'Europe', 
+                  'Russian Federation':'Europe', 
+                  'Canada':'North America', 
+                  'Germany':'Europe', 
+                  'India':'Asia',
+                  'France':'Europe', 
+                  'South Korea':'Asia', 
+                  'Italy':'Europe', 
+                  'Spain':'Europe', 
+                  'Iran':'Asia',
+                  'Australia':'Australia', 
+                  'Brazil':'South America'}
+    for index in merge3.index:
+           merge3.loc[index,"continent"]=ContinentDict[merge3.loc[index,'Country']]
+            
+            
+    group = ['1','2','3','4','5']
+    merge3['% Renewable'] = pd.cut(merge3['% Renewable'], bins=5 ,labels=group)
+    merge3["count"]=1
+    merge3=merge3.groupby(['continent','% Renewable']).agg({'count':'count'})
+    return pd.Series(merge3["count"])
+answer_twelve()
+
+// answer-13 //
+
+
+import pandas as pd
+import numpy as np
+import re
+def answer_thirteen():
+    energy = pd.read_excel('Energy Indicators.xls',parse_cols=[2,3,4,5],header=8,skiprows=7,skip_footer=38)
+    energy = energy.rename(columns={'Unnamed: 0': 'Country', 'Energy Supply': 'Energy Supply','Energy Supply per capita':'Energy Supply per Capita','Renewable Electricity Production':'% Renewable'})
+    energy['Energy Supply'] = energy['Energy Supply'].apply(lambda x: x*1000000)
+    energy1=energy.drop(0)
+    energy1.replace('...',np.nan,inplace=True)
+    energy1['Country'].replace('()','',inplace=True)
+    for names in list(energy1['Country']):
+        if '(' in str(names):
+            energy1.Country[energy1.Country==names] = names[:names.index('(')-1]
+        
+    for names in list(energy1['Country']):
+        if bool(re.search(r'\d', str(names))):
+            energy1.Country[energy1.Country==names] = re.sub("[^a-zA-Z\W]","", names)
+    energy1.replace(['United States of America'],['United States'],inplace=True)
+    energy1.replace(['Republic of Korea'],['South Korea'],inplace=True)
+    energy1.replace(['United Kingdom of Great Britain and Northern Ireland'],['United Kingdom'],inplace=True)
+    energy1.replace(['China, Hong Kong Special Administrative Region'],['Hong Kong'],inplace=True)
+
+    gdp_df=pd.read_csv('world_bank.csv',skiprows=[1,2,3],header=1)
+    gdp_df.replace(['Korea, Rep.'],['South Korea'],inplace=True) 
+    gdp_df.replace(['Iran, Islamic Rep.'],['Iran'],inplace=True)
+    gdp_df.replace(['Hong Kong SAR, China'],['Hong Kong'],inplace=True)
+    gdp_df=gdp_df[['Country Name','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    scimEn=pd.read_excel('scimagojr-3.xlsx')
+    scimEn=scimEn.iloc[0:15]   
+    merge1=pd.merge(energy1, scimEn, how="inner",on="Country") 
+    merge2=pd.merge(merge1, gdp_df, how='inner',left_on='Country',right_on='Country Name') 
+    merge3=merge2.drop('Country Name',1)
+    merge4=merge3.set_index(merge3['Country']).drop('Country',1)
+    merge4['est_population']=merge4['Energy Supply']/merge4['Energy Supply per Capita']
+    merge4['est_population'] = merge4['est_population'].map(lambda x: "{:,}".format(x))
+    return merge4['est_population']
+answer_thirteen()
